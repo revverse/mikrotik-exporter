@@ -40,12 +40,7 @@ func (c *routesCollector) collect(ctx *collectorContext) error {
 		return err
 	}
 
-	err = c.colllectForIPVersion("6", "ipv6", ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return c.colllectForIPVersion("6", "ip", ctx)
 }
 
 func (c *routesCollector) colllectForIPVersion(ipVersion, topic string, ctx *collectorContext) error {
@@ -70,11 +65,14 @@ func (c *routesCollector) colllectCount(ipVersion, topic string, ctx *collectorC
 		log.WithFields(log.Fields{
 			"ip_version": ipVersion,
 			"device":     ctx.device.Name,
+			"topic":      topic,
 			"error":      err,
 		}).Error("error fetching routes metrics")
 		return err
 	}
-
+	if reply.Done.Map["ret"] == "" {
+		return nil
+	}
 	v, err := strconv.ParseFloat(reply.Done.Map["ret"], 32)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -100,7 +98,9 @@ func (c *routesCollector) colllectCountProtcol(ipVersion, topic, protocol string
 		}).Error("error fetching routes metrics")
 		return err
 	}
-
+	if reply.Done.Map["ret"] == "" {
+		return nil
+	}
 	v, err := strconv.ParseFloat(reply.Done.Map["ret"], 32)
 	if err != nil {
 		log.WithFields(log.Fields{

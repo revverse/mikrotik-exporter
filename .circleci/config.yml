@@ -2,8 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.10.4-stretch
-    working_directory: /go/src/github.com/nshttpd/mikrotik-exporter
+      - image: circleci/golang:1.13.4-stretch
     branches:
       only:
         - master
@@ -11,5 +10,5 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker:
-          version: 18.05.0-ce
+          version: 18.06.0-ce
       - run: make dockerhub

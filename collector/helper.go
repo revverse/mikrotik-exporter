@@ -13,9 +13,13 @@ func metricStringCleanup(in string) string {
 }
 
 func descriptionForPropertyName(prefix, property string, labelNames []string) *prometheus.Desc {
+	return descriptionForPropertyNameHelpText(prefix, property, labelNames, property)
+}
+
+func descriptionForPropertyNameHelpText(prefix, property string, labelNames []string, helpText string) *prometheus.Desc {
 	return prometheus.NewDesc(
 		prometheus.BuildFQName(namespace, prefix, metricStringCleanup(property)),
-		property,
+		helpText,
 		labelNames,
 		nil,
 	)
@@ -31,13 +35,15 @@ func description(prefix, name, helpText string, labelNames []string) *prometheus
 }
 
 func splitStringToFloats(metric string) (float64, float64, error) {
-	strings := strings.Split(metric, ",")
-
-	m1, err := strconv.ParseFloat(strings[0], 64)
+	strs := strings.Split(metric, ",")
+	if len(strs) == 0 {
+		return 0, 0, nil
+	}
+	m1, err := strconv.ParseFloat(strs[0], 64)
 	if err != nil {
 		return math.NaN(), math.NaN(), err
 	}
-	m2, err := strconv.ParseFloat(strings[1], 64)
+	m2, err := strconv.ParseFloat(strs[1], 64)
 	if err != nil {
 		return math.NaN(), math.NaN(), err
 	}

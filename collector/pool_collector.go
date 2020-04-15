@@ -30,17 +30,7 @@ func (c *poolCollector) describe(ch chan<- *prometheus.Desc) {
 }
 
 func (c *poolCollector) collect(ctx *collectorContext) error {
-	err := c.collectForIPVersion("4", "ip", ctx)
-	if err != nil {
-		return err
-	}
-
-	err = c.collectForIPVersion("6", "ipv6", ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return c.collectForIPVersion("4", "ip", ctx)
 }
 
 func (c *poolCollector) collectForIPVersion(ipVersion, topic string, ctx *collectorContext) error {
@@ -88,7 +78,9 @@ func (c *poolCollector) collectForPool(ipVersion, topic, pool string, ctx *colle
 		}).Error("error fetching pool counts")
 		return err
 	}
-
+	if reply.Done.Map["ret"] == "" {
+		return nil
+	}
 	v, err := strconv.ParseFloat(reply.Done.Map["ret"], 32)
 	if err != nil {
 		log.WithFields(log.Fields{
